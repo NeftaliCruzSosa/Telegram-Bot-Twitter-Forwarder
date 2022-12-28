@@ -55,6 +55,7 @@ async function startThread(config) {
 }
 
 bot.command("start", async (ctx) => {
+  if (ctx.message.chat.type === 'private'){
   ctx.sendMessage(
     "Bienvenido al bot de Twitter!",
     {
@@ -86,9 +87,11 @@ bot.command("start", async (ctx) => {
       },
     }
   );
+  }
 });
 
 bot.on("message", async (ctx) => {
+  if (ctx.message.chat.type === 'private'){
   const chatId = ctx.chat.id;
   let config = await getConfiguration(chatId);
   switch (step) {
@@ -156,6 +159,7 @@ bot.on("message", async (ctx) => {
         }
       break;
   }
+}
 });
 
 bot.action("setProfile", (ctx) => {
@@ -213,7 +217,14 @@ bot.action("stopBot", async (ctx) => {
         ctx.reply(
             "El bot ha sido detenido"
            );
-      } else {
+      } else if(config.thread){
+        config.thread = null;
+        saveConfiguration(chatId, config);
+        ctx.reply(
+            "Parece que el bot se cerró sin terminar la ejecución anterior"
+           );
+      }
+      else {  
       ctx.reply("No hay ningun bot en ejecucion en estos momentos");
     }
   });
